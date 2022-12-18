@@ -25,9 +25,10 @@ template <class T> class Double_node {
 
         Double_node<T>* getPrev() { return prev; }
         void setPrev(Double_node<T>* _prev) { prev = _prev; }
-        
-        ~Double_node() {
-            cout << "\nDeleted Node " << getData();
+
+        Double_node &operator=(const Double_node& node) {
+            Double_node<T>* newCopy = new Double_node<T>(node);
+            return newCopy;
         }
 };
 
@@ -43,17 +44,18 @@ template <class T> class Double_list {
             setListTail(nullptr);
             calculateSize();
         }
-        Double_list(const Double_list& list) {
-            setListHead(list->head());
-            setListTail(list->list_tail());
-            calculateSize();
+        Double_list &operator=(const Double_list& dl) {
+            Double_list<T>* newCopy = new Double_list<T>(dl);
+            return newCopy;
         }
 
         int size() { 
             calculateSize();
             return list_size; 
         }
-        bool empty() { return list_size < 1;}
+        bool empty() { 
+            return size() < 1;
+        }
 
         //Getter
         Double_node<T>* head() { return list_head; }
@@ -62,7 +64,7 @@ template <class T> class Double_list {
         T back() { return tail()->getData();}
 
         int count(T obj) { 
-            if(list_size < 1) return 0;
+            if(size() < 1) return 0;
             Double_node<T>* tempNode = head();
             int count = 0;
 
@@ -76,7 +78,6 @@ template <class T> class Double_list {
 
         void displayList() {
             Double_node<T>* tempNode = head();
-
             while (tempNode != nullptr)
             {   
                 cout << tempNode->getData() << " ";
@@ -86,7 +87,6 @@ template <class T> class Double_list {
 
         void displayListReverse() {
             Double_node<T>* tempNode = tail();
-
             while (tempNode != nullptr)
             {   
                 cout << tempNode->getData() << " ";
@@ -120,8 +120,14 @@ template <class T> class Double_list {
 
         T pop_front() {
             Double_node<T>* popNode = head();
-            setListHead(popNode->getNext());
-            calculateSize();
+            if(popNode == tail()) {
+                setListHead(nullptr); 
+                setListTail(nullptr);
+            }
+            else {
+                setListHead(popNode->getNext());
+                calculateSize();
+            } 
             return popNode->getData();
         }
 
@@ -159,7 +165,7 @@ template <class T> class Double_list {
         //My functions
         void calculateSize() {
             Double_node<T>* nextNode = head();
-            int count = 0; 
+            int count = 0;
             while (nextNode != nullptr)
             {
                 nextNode = nextNode->getNext();
@@ -180,19 +186,6 @@ template <class T> class Double_list {
 };
 
 int main() {
-    Double_node<char>* head = new Double_node<char>('a');
-    Double_node<char>* second = new Double_node<char>('b');
-    Double_node<char>* tail = new Double_node<char>('c');
-
-    head->setNext(second);
-    tail->setPrev(second);
-    second->setPrev(head);
-    second->setNext(tail);
-
-    Double_list<char>* dl = new Double_list<char>();
-    dl->setListHead(head);
-    dl->setListTail(tail);
-    dl->displayList();
-    delete dl;
+     
     return 0;
-}
+}   
