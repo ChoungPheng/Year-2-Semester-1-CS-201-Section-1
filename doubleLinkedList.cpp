@@ -39,14 +39,38 @@ template <class T> class Double_list {
         int list_size = 0;
     
     public:
+        Double_list(Double_list<T>* dl) {
+            Double_node<T>* newHead;
+            switch (dl->size())
+            {
+                case 0:
+                    setListHead(nullptr);
+                    setListTail(nullptr);
+                    break;
+                case 1:
+                    newHead = new Double_node<T>(dl->head()->getData());
+                    setListHead(newHead);
+                    setListTail(nullptr);
+                default:
+                    newHead = new Double_node<T>(dl->head()->getData());
+                    Double_node<T>* newTail = new Double_node<T>(dl->head()->getNext()->getData());
+                    setListHead(newHead);
+                    setListTail(newTail);
+                    newHead->setNext(newTail);
+                    newTail->setPrev(newHead);
+                    Double_node<T>* tempNode = dl->head()->getNext()->getNext();
+                    while (tempNode != nullptr)
+                    {
+                        push_back(tempNode->getData());
+                        tempNode = tempNode->getNext();
+                    }
+                    break;
+            }
+        }
         Double_list() {
             setListHead(nullptr);
             setListTail(nullptr);
             calculateSize();
-        }
-        Double_list &operator=(const Double_list& dl) {
-            Double_list<T>* newCopy = new Double_list<T>(dl);
-            return newCopy;
         }
 
         int size() { 
@@ -103,24 +127,36 @@ template <class T> class Double_list {
 
             setListHead(newHead);
             setListTail(newTail);
-            calculateSize();
 
             newList->setListHead(currentHead);  
             newList->setListTail(currentTail);
-            newList->calculateSize();
         }
 
         void push_back(T obj) {
             Double_node<T>* newNode = new Double_node<T>(obj);
-            newNode->setPrev(tail());
-            tail()->setNext(newNode);
-            setListTail(newNode);
-            calculateSize();
+            switch (size())
+            {
+            case 0:
+                setListHead(newNode);
+                setListTail(nullptr);
+                break;
+            case 1:
+                head()->setNext(newNode);
+                newNode->setPrev(head());
+                setListTail(newNode);
+                break;
+            default:
+                newNode->setPrev(tail());
+                tail()->setNext(newNode);
+                setListTail(newNode);
+                break;
+            }
+            
         }
 
         T pop_front() {
             Double_node<T>* popNode = head();
-            if(popNode == tail()) {
+            if(size() < 2) {
                 setListHead(nullptr); 
                 setListTail(nullptr);
             }
@@ -186,6 +222,27 @@ template <class T> class Double_list {
 };
 
 int main() {
+    Double_node<int>* a = new Double_node<int>(1);
+    Double_node<int>* b = new Double_node<int>(2);
+    Double_node<int>* c = new Double_node<int>(3);
+
+    a->setNext(b);
+    b->setPrev(a);
+    b->setNext(c);
+    c->setPrev(b);
      
+    Double_list<int>* dl = new Double_list<int>();
+    dl->setListHead(a);
+    dl->setListTail(c);
+
+    Double_list<int>* dlx = new Double_list<int>(dl);
+    dlx->displayList();
+    dlx->pop_front();
+    dlx->pop_front();
+    dlx->pop_front();
+    dlx->push_back(10);
+    dlx->push_back(20);
+    dlx->push_back(30);
+    dlx->displayList();
     return 0;
 }   
